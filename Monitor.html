@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="author" content="Rafa Gómez https://rafagomez.neocities.org" />
+	<meta charset="utf-8">
+	<script defer src="https://use.fontawesome.com/releases/v5.0.1/js/all.js"></script>
+    <style>
+        .container {
+             display: flex;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(3, 200px);
+            /* grid-gap: 15px; */
+            grid-row-gap:    15px;
+            grid-column-gap: 15px;
+        }
+        .cuadro {            
+            margin: 10px;
+            padding: 10px;
+            color: gray;
+            background-color: darksalmon;
+            border-radius: 25%;
+            height: 200px;
+            width:  200px;
+            box-shadow: 5px 5px gray;
+        }
+        #actual {
+            background-color: #f1f1f1;
+            padding: 10px;
+            margin:  10px;
+        }
+        #aside {
+            background-color: #f1f1f1;
+            min-width: 400px;
+        }
+        
+    </style>
+
+    <script src="Lib/rogLib.js"></script>
+    <script src="Lib/rogFB.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>
+    <script src="Lib/Encuestas.js"></script>
+    
+    <title>AD. Monitor</title>
+    <link rel="shortcut icon" href="Lib/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="Lib/Encuestas.css" type="text/css" media="all"/>
+    
+    <script>
+        var grid;
+        var nsnc = "NS/NC";
+        
+        function leeEnc() {
+            firebase.database().ref("/AD/Encuestas")
+                .once('value').then(snap => {
+                    analEnc(snap.val());
+            }).catch(err => {
+                Alert("¡No se pudo leer las Encuestas!");
+                console.log(err);
+            });
+        }
+        function leeResp() {
+            firebase.database().ref('/AD/Respuestas')
+                .once('value').then(snap => {
+                    analResp(snap.val());
+                }).catch(err => {
+                    Alert("¡No se pudo leer!");
+                    console.log(err);
+                });
+        }
+        function analResp(datos) {
+            // Las Respuestas pueden ser:
+            // 1. "NS/NC"
+            // 2. {txt, valor} (Valor es el índice y no sirve porque puede rotar el orden)
+            // 3. Un arreglo de: {txt, valor} valor es inmutable
+            let opciones = [];
+            for(x in datos) {
+                let nro = parseInt(x.Nro);
+                
+                if(opciones[nro])
+                    if(opciones[nro][x]) 
+                        
+            }
+        }
+        function analEnc(datos) {
+            // Valores:
+            // 1- Genero
+            // 2- Edad
+            // 3- Encuestador
+            // 4- Fecha (Por mes)
+
+            let opciones = [];
+            for(x in datos) {
+                
+            }
+        }
+        function cierraCuadro(cuadro) {
+            if (cuadro) {
+                // cierra el objeto
+            } else {
+                // cierra el cuadro "actual"
+            }
+        }
+        function nuevo() {
+            let cuadro = document.createElement("DIV");
+            cuadro.className = "cuadro";
+            grid.appendChild(cuadro);
+        }
+        function debut() {
+            grid = objDom("grid");
+            iniFireBase();
+        }
+    </script>
+</head>
+
+<body onload="debut()">
+    <header style="display: flex">
+        <img src="Lib/AD Logo.png" class="logo"/>
+        <h1>Monitor de Encuestas</h1>
+    </header>
+
+    <div class="container">
+        <aside>
+            <label for="encuestas">Encuesta:</label>
+            <select name="encuesta">
+                <option value="FR3">FR3</option>
+                <option value="FR6">FR6</option>
+                <option value="FR11">FR11</option>
+            </select><br/><br/>
+            <button onclick="nuevo()" class="rogBtn"><span class="nueva fa fa-plus-circle"></span></button>
+            <ol>DPT
+                <li>Cauca</li>
+                <li>Santander N.</li>
+                <li>Cajicá</li>
+            </ol>
+        </aside>
+        <div class="grid" id="grid"></div>
+        <div class="actual">
+            <h2>20 Encuestas</h2>
+            <h2>Actual</h2>
+            <ul id="caracteristicas">
+                <li>Municipio Cajicá</li>
+                <li>Imagen</li>
+                <li>Fulanito</li>
+            </ul>
+            <ul id="datos">
+                <l1>10/05 Desfavorable</l1>
+                <l1>15/05 Favorable</l1>
+                <l1>15/05 Desfavorable</l1>
+                <l1>15/05 Desfavorable</l1>
+                <l1>16/05 Favorable</l1>
+                <l1>16/05 Favorable</l1>
+                <l1>17/05 Favorable</l1>
+                <l1>18/05 Desfavorable</l1>
+            </ul>
+            <button class="rogBtn" onclick="cierraCuadro()">Cerrar</button>
+        </div>
+    </div>
+    
+    <footer>Elaborado por <a href="https://rafagomez.neocities.org">Rafa Gómez</a></footer>
+</body>
+</html>

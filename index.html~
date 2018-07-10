@@ -1,0 +1,321 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="author" content="Rafa Gómez https://rafagomez.neocities.org" />
+	<meta charset="utf-8">
+	<script defer src="https://use.fontawesome.com/releases/v5.0.1/js/all.js"></script>
+    <script src="Lib/rogLib.js"></script>
+    
+    <title>AD - Encuestas</title>
+    <link rel="shortcut icon" href="Lib/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="Lib/Encuestas.css" type="text/css" media="all"/>
+    <script>
+        var indicacion;
+        var domPregunta = {};
+        var preguntas = [];
+        var awe = clsAwesome();
+ 
+        const dataEncuesta = {
+            puesto:	"Alcalde",
+            dpt:	"Cajicá",
+            UNO:	4,
+            DOS:	2,
+            TRES:	1,
+            puesto2:	"al concejo",
+            Personajes:	[
+                "Edilberto Afanador",
+                "Orlando Díaz Canasto",
+                "Fabio Ramírez",
+                "Diego Jimenez",
+                "Fabiola Jácome",
+                "Angélica Perilla",
+                "Richard Suarez"
+            ],
+            Partidos: [
+                "Partido de la U",
+                "Liberal",
+                "Polo Democrático",
+                "Centro Democrático",
+                "Mira",
+                "Cambio Radical",
+                "Conservador",
+                "Partido Verde",
+                "Opción Ciudadana",
+                "Mais",
+                "ASI",
+                "Ninguno"
+            ],
+			Problemas: [
+				"Seguridad",
+				"Recreación & Deporte",
+				"Servicios Públicos",
+				"Salud",
+				"Desempleo",
+				"Drogadicción",
+				"Movilidad"
+        }
+	const Medios = [Facebook
+"Vallas",
+"Televisión local",
+"Correos electrónicos",
+"Periódico impreso",
+"Cartas",
+"Volantes",
+"Perifoneo"
+]
+        const calificadores = {
+            Imagen: ["Favorable", "Desfavorable", "No le Conoce"]
+Gestion: ["Excelente", "Buena", "Mala", "Pésima"]
+        }
+        function mst(dom) {
+            let tabActivo = document.querySelector(".rogTabActivo")
+            if(tabActivo) tabActivo.classList.remove("rogTabActivo");
+            document.getElementById(dom).classList.add("rogTabActivo");
+        }
+        function mstIndicacion(msj) { indicacion.innerHTML = msj || ""; }
+        
+        function cargaEncuesta() {
+ //           leeJson("fr6.json", (datos) => {
+//                preguntas = datos;
+                mstPregunta();
+//            });
+        }
+        function mstIdentifica() {
+            mstIndicacion("Buenos días/tardes, mi nombre es ________ Trabajo para AD CONSULTORES, empresa dedicada a conocer, a través de encuestas, la opinión de personas como usted acerca de diferentes temas.<br/>Valoramos su tiempo y esta encuesta solo debería tardar aproximadamente 10 minutos.<br/>No requerimos su nombre o identificación y sus respuestas serán tratadas con estricta confidencialidad solo para análisis estadístico.<br/>Si desea confirmar la veracidad de este estudio puede comunicarse al teléfono: <strong>301 4105814</strong>.");
+            mst("idEncuesta");
+        }
+        function mstEncuesta() { mst("encuesta"); }
+        function mstFinale() {
+            indicacion.innerHTML = "";
+            mstResultados();
+            mst("finale");
+        }
+        
+        function mstResultados() {
+            let dom = objDom("divRespuestas");
+            
+            // Datos de la Encuesta
+            dom.innerHTML =
+                "Inscrito   : " +evalRadio("Inscrito")  +"<br/>"+
+                "Género     : " +evalRadio("genero")    +"<br/>"+
+                "Sector     : " +valDom("sector")       +"<br/>"+
+                "Encuestador: " +valDom("encuestador")  +"<br/>"+
+                "Supervisor : " +valDom("supervisor")   +"<br/>";
+            dom.appendChild(document.createElement("HR"));
+            // Respuestas
+            dom.innerHTML += preguntas.map((x,i) =>
+                i+". "+x.Nro +": " +x.respuesta
+            ).join("<br/>");
+        }
+        
+        function responder(valor,nro) {
+            preguntas[domPregunta.nro].respuesta = valor;
+            siguiente();
+        }
+        
+        function evalua(e) {
+            let respuesta;
+            if(e) {
+                let que = e.currentTarget.id;
+                switch(que) {
+                    case "NSNC": responder(0);
+                        break;
+                    case "combo":
+                        let xOpcion = parseInt(domPregunta.combo.value)-1;
+                        let opcion = domPregunta.combo.children[xOpcion];
+                        respuesta = opcion.textContent;
+                        if(respuesta === "(libre)") preguntas[domPregunta.nro].opciones[xOpcion] = prompt("Tipea tu respuesta, por favor");
+                        responder(domPregunta.combo.value);
+                        break;
+                    default:
+                        // Evalua las categorizaciones
+                        respuesta = Array.from(document.querySelectorAll(".respRadio"))
+                        .map(x => {
+                            let retorno;
+                            Array.from(x.children).forEach(x => {
+                                if(x.checked) retorno = x.value;
+                            });
+                            return retorno;
+                        });
+                        if(respuesta.includes(undefined)) alert("¡No deje respuestas en blanco!");
+                        else responder(respuesta);
+                }
+            }
+        }
+        
+        function mstPregunta(nro) {
+            function llenaCmb(opciones) {
+                let lista = "";
+                
+                opciones.forEach((x,i) => {
+                   lista += "<option value='" +(i+1)+"' class='opcion'>" +x +"</option>"
+                });
+
+                domPregunta.combo.innerHTML = lista;
+                domPregunta.combo.size = opciones.length;
+            }
+
+            function llenaTabla(opciones,opcRespuestas) {
+                function opcResp (opciones) {
+                    function identifica(i) {
+                        return retorno.replace(/%/g, i);
+                    }
+                    let retorno = "<spam class='respRadio'>"
+                    opciones.forEach((x,i) => {
+                        retorno += "<input type='radio' value='" +i+"' name='opc%'>" +x;
+                    });
+                    retorno += "</spam>";
+                    return identifica;
+                }
+                
+                let lista = "";
+                let wRespuesta = opcResp(opcRespuestas);
+                opciones.forEach((x,i) => {
+                    lista += "<tr><td class='opcion'>" + x +"</td><td>" +wRespuesta(i) +"</td></tr>";
+                });
+                domPregunta.tabla.innerHTML = lista;
+            }
+           
+            domPregunta.nro = nro === undefined ? domPregunta.nro +1 : nro;
+            
+            let pregunta = preguntas[domPregunta.nro];
+
+            domPregunta.wNro.innerHTML = pregunta.Nro;
+            domPregunta.txt.innerHTML = pregunta.Pregunta;
+            
+            indicacion.innerHTML = pregunta.indicacion;
+            
+            if (pregunta.tipoResp) {
+                llenaTabla(pregunta.opciones, calificadores[pregunta.tipoResp]);
+                if(pregunta.respuesta) {
+                    Array.from(document.querySelectorAll(".respRadio"))
+                    .forEach((x,i) => {
+                        x.children[pregunta.respuesta[i]].checked = true;
+                    });
+                }
+                domPregunta.tabla.style.display = "Block";
+                domPregunta.combo.style.display = "none";
+            } else {
+                llenaCmb(pregunta.opciones);
+                domPregunta.tabla.style.display = "none";
+                domPregunta.combo.style.display = "Block";
+                if(pregunta.respuesta) domPregunta.combo.value = pregunta.respuesta;
+            }
+            
+            if (pregunta.respuesta === undefined) {
+                domPregunta.nsnc.className = awe.chequear.no;
+            } else {
+                if(pregunta.respuesta) {
+                    
+                } else {
+                    domPregunta.nsnc.className = "Activo " +awe.chequear.si;
+                }
+            }
+        }
+
+        function siguiente() {
+            if(domPregunta.nro === preguntas.length -1) {
+                mstFinale()
+            } else {
+                mstPregunta(domPregunta.nro +1)
+            }
+        }
+        
+        function anterior() {
+            if(domPregunta.nro) {
+                mstPregunta(domPregunta.nro -1)
+            }
+        }
+        
+        function debut() {
+            indicacion =  objDom("indicacion");
+            domPregunta = {
+                ultima: -1,
+                nro:    -1,
+                wNro:  objDom("nroPreg"),
+                txt:   objDom("txt"),
+                combo: objDom("combo"),
+                tabla: objDom("tabla"),
+                nsnc:  objDom("nsnc")
+            }
+            mstIdentifica();
+            cargaEncuesta();
+            rogAsigna("#pregSig","onclick",evalua); // siguiente);
+            rogAsigna("#pregAnt","onclick",anterior);
+            rogAsigna("#NSNC","onclick",evalua);
+            rogAsigna("#combo","oninput",evalua);
+        }
+    </script>
+</head>
+
+<body onLoad="debut()">
+    <header style="display: flex">
+        <img src="Lib/AD Logo.png" class="logo"/>
+        <h1>Encuesta FR6 Municipio Cajicá</h1>
+    </header>
+    <div class="rogTabs">
+        <button class="rogTabEtq" onClick="mstIdentifica()">Identificación</button>
+        <button class="rogTabEtq" onClick="mstEncuesta()">Encuesta</button>
+        <button class="rogTabEtq" onClick="mstFinale()">Fin</button>
+    </div>
+    <div class="rogTab" id="idEncuesta">
+        <fieldset>
+            <label for="inscrito">¿Esta su cedula inscrita para votar en Cajicá?</label>
+            <input type="radio" value="Inscrito"   name="Inscrito"/>Si
+            <input type="radio" value="noInscrito" name="Inscrito" onClick="finale()"/>No
+        </fieldset>
+        <fieldset>
+            <br/>
+            <label for="genero">Género</label>
+            <input type="radio" value="Masc" name="genero"/>Masc
+            <input type="radio" value="Fem"  name="genero"/>Fem<br/><br/>
+            <label for="edad">Edad</label><br/>
+            <select name="edad" size="4">
+                <option value="18-30">18 a 30 años</option>
+                <option value="31-45">31 a 45 años</option>
+                <option value="46-60">46 a 60 años</option>
+                <option value="60+">más de 60 años</option>
+            </select><br/><br/>
+            <label for="sector">Sector</label>
+            <input type="text" name="sector"/><br/><br/>
+        </fieldset>
+        <fieldset>
+            <label for="encuestador">Encuestador</label>
+            <input type="text" name="encuestador"/>
+            <label for="supervisor">Supervisor</label>
+            <input type="text" name="supervisor"/>
+        </fieldset>
+    </div>
+    <div class="rogTab" id="encuesta">
+        <div style="display: flex">
+            <div id="pregAnt" class="rogFlecha"><span class="fa fa-caret-left"></span></div>
+            <div id="pregunta">
+                <h3>Pregunta Nro. <span id="nroPreg"></span></h3>
+                <p id="txt"></p>
+                <select id="combo"></select>
+                <table id="tabla"></table>
+            </div>
+            <div id="NSNC"><p>NS/NC</p><p><span id="nsnc"></span></p></div>
+            <div id="pregSig" class="rogFlecha"><span class="fa fa-caret-right"></span></div>
+        </div>
+    </div>
+    <div class="rogTab" id="finale">
+        <h1>Muchas gracias por su tiempo</h1>
+        <div id="divRespuestas"></div>
+    </div>
+    <div id="indicacion">
+    </div>
+    <footer>
+        Elaborado por <a href="https://rafagomez.neocities.org">Rafa Gómez</a>
+    </footer>
+    <script>
+        preguntas = [{ Nro: "1", Pregunta: "Ahora le voy a leer una lista de personajes del municipio, dígame por favor si tiene una imagen favorable o desfavorable de cada uno de ellos. Si no los conoce, por favor dígamelo.", indicacion: "Lea todas las opciones", tipo: "imagen", tipoResp: "Imagen", args: "Personajes", opciones: ["Edilberto Afanador", "Orlando Díaz Canasto", "Fabio Ramírez", "Diego Jimenez", "Fabiola Jácome", "Angélica Perilla", "Richard Suarez"]},
+ { Nro: "2", Pregunta: "Ahora bien, hablando de un supuesto escenario electoral en Cajicá, si las elecciones a Alcalde se realizarán mañana, ¿por cuál de estas personas votaría Ud.?", indicacion: "Lea todas las opciones", tipo: "Intencion", args: ["puesto", "Municipio", "Personajes"], opciones: ["Edilberto Afanador", "Orlando Díaz Canasto", "Fabio Ramírez", "Diego Jimenez", "Fabiola Jácome", "Angélica Perilla", "Richard Suarez", "Voto en blanco ", "No Votaría "]},
+ { Nro: "3", Pregunta: "Me podría decir el nombre del candidato al concejo por el cual piensa votar?", tipo: "candidato", args: "al concejo", opciones: ["(libre)", "No votaría"]},
+  { Nro: "4", Pregunta: "Y si a las elecciones para Alcalde solo se presentaran Fabio Ramírez y Orlando Diaz ¿Por cuál de los dos votaría usted?", indicacion: "Lea todas las opciones", tipo: "Duelo(2)", args: "puesto", opciones: ["FABIO RAMÍREZ", "ORLANDO DIAZ", "No votaría"]},
+  { Nro: "5", Pregunta: "Y si a las elecciones para alcalde solo se presentaran Fabio Ramírez y Fabiola Jacome. ¿Por cuál de los dos votaría usted?", "indicacion": "Lea todas las opciones", tipo: "Duelo", args: "puesto", opciones: ["FABIOLA JACOME", "FABIO RAMÍREZ", "No votaría"]},
+  { Nro: "6", Pregunta: "Independientemente de su preferencia, cuál de los candidatos a la alcaldía cree usted ganará próximas elecciones?", indicacion: "Lea todas las opciones", tipo: "Ganador", opciones: ["Edilberto Afanador", "Orlando Díaz Canasto", "Fabio Ramírez", "Diego Jimenez", "Fabiola Jácome", "Angélica Perilla", "Richard Suarez", "Voto en blanco ", "No Votaría"]},
+  { Nro: "7", Pregunta: "¿Y a qué partido político pertenece el candidato al Concejo por el que piensa votar?", tipo: "partidoCandidato", args: ["partidos", "puesto2"], opciones: ["Partido de la U", "Liberal", "Polo Democrático", "Centro Democrático", "Mira", "Cambio Radical", "Conservador", "Partido Verde", "Opción Ciudadana", "Mais", "ASI", "Ninguno"]}];
+    </script>
+</body>
+</html>

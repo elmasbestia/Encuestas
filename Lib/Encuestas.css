@@ -1,0 +1,93 @@
+/* CSS para AD Encuestas */
+    .logo {
+        margin: 10px;
+        height: 60px;
+    }
+    /* Orejas */
+    .rogTabs {
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: #f1f1f1;
+    }
+
+    .rogTabs button {
+        background-color: inherit;
+        float: left;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        transition: 0.3s;
+    }
+
+    .rogTabs button:hover {
+        background-color: #ddd;
+    }
+
+    .rogTabs .active {
+        background-color: #ccc;
+    }
+
+    .rogTab {
+        display: none;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-top: none;
+        margin: auto;
+    }
+    .rogTabActivo {
+        display: block;
+    }
+    #indicacion {
+        background-color: #f1f1f1;
+        color: blue;
+        padding: 10px;
+        font-size: .8em;
+    }
+    #pregunta {
+        background-color: black;
+        color: white;
+        padding: 40px;
+    }
+    #nroPreg {
+        margin: 2px;
+    }
+
+    footer {
+        display: flex;
+        font-size: small;
+        height: 80px;
+        border: 0;
+        box-shadow: 0 10px 10px -10px #8c8c8c inset;
+        Padding: 5px;
+        Top: 10px;
+        justify-content: flex-end;
+    }
+    
+    .rogFlecha {
+        margin: auto;
+        padding-left:  15px;
+        padding-right: 15px;
+        cursor: pointer;
+        font-size: 3em;
+    }
+    #NSNC {
+        background-color: black;
+        color: grey;
+        margin: auto;
+		text-align: center;
+        padding:  15px;
+        cursor: pointer;
+        border-radius: 90px;
+        height: 60px;
+		
+    }
+	.nsncActivo {
+        background-color: red;
+        color: grey;
+	}
+    .opcion {
+        font-size: 2em;
+        background-color: #f1f1f1;
+        color: deepskyblue;
+    }
